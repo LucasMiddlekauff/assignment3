@@ -48,7 +48,7 @@ app.get("/product/:id", async (req, res) => {
 });
 
 //adding a product
-app.post("/product/addProduct", async (req, res) => {
+app.post("/addProduct", async (req, res) => {
   try {
     await client.connect();
 
@@ -71,5 +71,68 @@ app.post("/product/addProduct", async (req, res) => {
   } catch (error) {
     console.error("An error occurred:", error);
     res.status(500).send({ error: "An internal server error occurred" });
+  }
+});
+
+app.delete("/deleteProduct/:id", async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    await client.connect();
+    console.log("Product to delete :", id);
+
+    const query = { id: id };
+
+    // read data from products to delete to send it to frontend
+    const productDeleted = await db.collection("products").findOne(query);
+
+    // delete
+    const deletionResult = await db.collection("products").deleteOne(query);
+
+    // Send combined response
+    res.status(200).send({
+      deletedProduct: productDeleted,
+      deletionResult: deletionResult,
+    });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+app.put("/updateProduct/:id", async (req, res) => {
+  try {
+    const updateData = {
+      $set: {
+        name: req.body.name,
+        price: req.body.price,
+        description: req.body.description,
+        imageUrl: req.body.imageUrl,
+      },
+    };
+    const id = Number(req.params.id);
+    const query = { id: id };
+
+    // Add options if needed, for example { upsert: true } to create a document if it doesn't exist
+    const options = {};
+
+    // Update the document
+    const updateResult = await db
+      .collection("robot")
+      .updateOne(query, updateData, options);
+
+    // If no document was found to update, you can choose to handle it by sending a 404 response
+    if (updateResult.matchedCount === 0) {
+      return res.status(404).send({ message: "Robot not found" });
+    }
+
+    // Read updated data from robot to send to frontend
+    const robotUpdated = await db.collection("robot").findOne(query);
+
+    // Send updated robot data as a response
+    res.status(200).send(robotUpdated);
+  } catch (error) {
+    console.error("Error updating robot:", error);
+    res.status(500).send({ message: "Internal Server Error" });
   }
 });
