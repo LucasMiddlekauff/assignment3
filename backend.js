@@ -59,8 +59,9 @@ app.post("/addProduct", async (req, res) => {
       id: values[0], // also "id": req.body.id,
       name: values[1], // also "name": req.body.name,
       price: values[2], // also "price": req.body.price,
+      category: values[4],
       description: values[3], // also "description": req.body.description,
-      imageUrl: values[4], // also "imageUrl": req.body.imageUrl
+      imageUrl: values[5], // also "imageUrl": req.body.imageUrl
     };
     console.log(newDocument);
 

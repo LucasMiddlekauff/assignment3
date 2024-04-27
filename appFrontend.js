@@ -11,6 +11,20 @@ function App() {
   //
   const Getcatalog = () => {
     // Define hooks
+    const [oneProduct, setOneProduct] = useState([]);
+    const [id, setId] = useState("");
+    // useEffect to load catalog once HOOK id is modified
+    useEffect(() => {
+      if (id) {
+        fetch(`http://localhost:8081/product/${id}`)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Show one product :", data);
+            setOneProduct([data]);
+          });
+      }
+    }, [id]); // Fetch only when id changes
+    // Define hooks
     const [products, setProducts] = useState([]);
     const navigate = useNavigate();
     // useEffect to load products when load page
@@ -26,9 +40,7 @@ function App() {
       <div>
         {/* Buttons to show CRUD */}
         <button onClick={() => navigate("/getcatalog")}>GET Catalog</button>
-        <button onClick={() => navigate("/getcatalogid")}>
-          GET Item by Id
-        </button>
+
         <button onClick={() => navigate("/postcatalog")}>
           POST a new Item
         </button>
@@ -47,53 +59,6 @@ function App() {
             <div>Price: {el.price}</div>
           </div>
         ))}
-      </div>
-    );
-  };
-
-  // GET one item
-  const Getcatalogid = () => {
-    // Define hooks
-    const [oneProduct, setOneProduct] = useState([]);
-    const navigate = useNavigate();
-    const [id, setId] = useState("");
-    // useEffect to load catalog once HOOK id is modified
-    useEffect(() => {
-      if (id) {
-        fetch(`http://localhost:8081/product/${id}`)
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Show one product :", data);
-            setOneProduct(data);
-          });
-      }
-    }, [id]); // Fetch only when id changes
-
-    // return
-    return (
-      <div>
-        {/* Buttons to show CRUD */}
-        <button onClick={() => navigate("/getcatalog")}>GET Catalog</button>
-        <button onClick={() => navigate("/getcatalogid")}>
-          GET Item by Id
-        </button>
-        <button onClick={() => navigate("/postcatalog")}>
-          POST a new Item
-        </button>
-        <button onClick={() => navigate("/putcatalog")}>
-          PUT (modify) an Item
-        </button>
-        <button onClick={() => navigate("/deletecatalog")}>
-          DELETE an Item
-        </button>
-        <br />
-        <input
-          type="text"
-          placeholder="Enter ID"
-          onChange={(e) => setId(e.target.value)}
-        />
-
-        {/* Show one product using map */}
         {oneProduct.map((el) => (
           <div key={el.id}>
             <img src={el.imageUrl} alt="product" width={30} />
@@ -102,11 +67,15 @@ function App() {
             <div>Price: {el.price}</div>
           </div>
         ))}
+        <input
+          type="text"
+          placeholder="Enter ID"
+          onChange={(e) => setId(e.target.value)}
+        />
       </div>
     );
   };
 
-  // POST a new item
   const Postcatalog = () => {
     // Define HOOKS
     const navigate = useNavigate();
@@ -131,7 +100,7 @@ function App() {
     const handleSubmit = (e) => {
       e.preventDefault();
       console.log(e.target.value);
-      fetch("http://localhost:8081/listProducts", {
+      fetch("http://localhost:8081/addProduct", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -178,19 +147,19 @@ function App() {
           <h1>Post a New Product</h1>
           <input
             type="text"
-            name="id"
-            value={formData.id}
+            name="name"
+            value={formData.name}
             onChange={handleChange}
-            placeholder="ID"
+            placeholder="Title"
             required
           />{" "}
           <br />
           <input
             type="text"
-            name="title"
-            value={formData.name}
+            name="id"
+            value={formData.id}
             onChange={handleChange}
-            placeholder="Title"
+            placeholder="ID"
             required
           />{" "}
           <br />
@@ -223,8 +192,8 @@ function App() {
           <br />
           <input
             type="text"
-            name="image"
-            value={formData.imageUrl}
+            name="imageUrl"
+            value={formData.imageURL}
             onChange={handleChange}
             placeholder="Image URL"
             required
@@ -237,7 +206,7 @@ function App() {
     );
   };
 
-  // PUT - Modify an item
+  // Delete - Modify an item
   const Deletecatalog = () => {
     // Define HOOKS
     const [products, setProducts] = useState([
@@ -278,7 +247,7 @@ function App() {
     // Delete de product by its id <- id is Hook
     const deleteOneProduct = (id) => {
       console.log("Product to delete :", id);
-      fetch("http://localhost:8081/product/" + id, {
+      fetch("http://localhost:8081/deleteProduct/" + id, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: id }),
@@ -317,9 +286,7 @@ function App() {
       <div>
         {/* Buttons to show CRUD */}
         <button onClick={() => navigate("/getcatalog")}>GET Catalog</button>
-        <button onClick={() => navigate("/getcatalogid")}>
-          GET Item by Id
-        </button>
+
         <button onClick={() => navigate("/postcatalog")}>
           POST a new Item
         </button>
@@ -353,7 +320,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/getcatalog" element={<Getcatalog />} />
-        <Route path="/getcatalogid" element={<Getcatalogid />} />
         <Route path="/postcatalog" element={<Postcatalog />} />
         {/* <Route path="/putcatalog" element={<Putcatalog />} /> */}
         <Route path="/deletecatalog" element={<Deletecatalog />} />
