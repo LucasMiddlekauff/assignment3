@@ -119,19 +119,19 @@ app.put("/updateProduct/:id", async (req, res) => {
 
     // Update the document
     const updateResult = await db
-      .collection("robot")
+      .collection("products")
       .updateOne(query, updateData, options);
 
     // If no document was found to update, you can choose to handle it by sending a 404 response
     if (updateResult.matchedCount === 0) {
-      return res.status(404).send({ message: "Robot not found" });
+      return res.status(404).send({ message: "product not found" });
     }
 
     // Read updated data from robot to send to frontend
-    const robotUpdated = await db.collection("robot").findOne(query);
+    const productUpdated = await db.collection("products").findOne(query);
 
     // Send updated robot data as a response
-    res.status(200).send(robotUpdated);
+    res.status(200).send(productUpdatedUpdated);
   } catch (error) {
     console.error("Error updating robot:", error);
     res.status(500).send({ message: "Internal Server Error" });

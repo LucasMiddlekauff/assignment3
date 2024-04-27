@@ -91,11 +91,14 @@ function App() {
     // Function to add input in formData HOOK using operator ...
     const handleChange = (e) => {
       const { name, value } = e.target;
+      const newValue =
+        name === "id" || name === "price" ? Number(value) : value; // Convert to number if name is 'id' or 'price'
       setFormData((prevState) => ({
         ...prevState,
-        [name]: value,
+        [name]: newValue,
       }));
     };
+
     // Function to fetch backend for POST - it sends data in BODY
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -155,7 +158,7 @@ function App() {
           />{" "}
           <br />
           <input
-            type="text"
+            type="number"
             name="id"
             value={formData.id}
             onChange={handleChange}
@@ -164,7 +167,7 @@ function App() {
           />{" "}
           <br />
           <input
-            type="text"
+            type="number"
             name="price"
             value={formData.price}
             onChange={handleChange}
