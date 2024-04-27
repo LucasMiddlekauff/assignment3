@@ -224,6 +224,7 @@ function App() {
     ]);
     const [index, setIndex] = useState(0);
     const navigate = useNavigate();
+    const [isConfirm, setIsConfirm] = useState();
     // useEffect to load catalog when load page
     useEffect(() => {
       fetch("http://localhost:8081/listProducts")
@@ -247,6 +248,7 @@ function App() {
         else setIndex(index - 1);
       }
     }
+
     // Delete de product by its id <- id is Hook
     const deleteOneProduct = (id) => {
       console.log("Product to delete :", id);
@@ -283,13 +285,13 @@ function App() {
           console.error("Error adding item:", error);
           alert("Error adding robot:" + error.message); // Display alert if there's an error
         });
+      setIsConfirm(false);
     };
     // return
     return (
       <div>
         {/* Buttons to show CRUD */}
         <button onClick={() => navigate("/getcatalog")}>GET Catalog</button>
-
         <button onClick={() => navigate("/postcatalog")}>
           POST a new Item
         </button>
@@ -299,14 +301,17 @@ function App() {
         <button onClick={() => navigate("/deletecatalog")}>
           DELETE an Item
         </button>
-
         {/* Buttons to simulate carousel */}
         <h3>Delete one product:</h3>
         <button onClick={() => getOneByOneProductPrev()}>Prev</button>
         <button onClick={() => getOneByOneProductNext()}>Next</button>
-        <button onClick={() => deleteOneProduct(products[index].id)}>
-          Delete
-        </button>
+        <button onClick={() => setIsConfirm(true)}>Delete</button>
+
+        {isConfirm && (
+          <button onClick={() => deleteOneProduct(products[index].id)}>
+            Click to confirm delete
+          </button>
+        )}
         {/* Show product properties, one by one */}
         <div key={products[index].id}>
           <img src={products[index].imageUrl} width={30} /> <br />
